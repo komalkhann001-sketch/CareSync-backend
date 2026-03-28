@@ -9,10 +9,8 @@ const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 // Load environment variables
 dotenv.config();
 
-// Connect to Database
-connectDB();
-
 const app = express();
+
 
 // Middlewares
 app.use(cors({
@@ -21,6 +19,20 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+
+// DB Middleware to ensure connection on each request (Better for Vercel)
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('Database connection failed in middleware');
+        res.status(500).json({ 
+            message: 'Database connection failed. Please try again.',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+        });
+    }
+});
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));

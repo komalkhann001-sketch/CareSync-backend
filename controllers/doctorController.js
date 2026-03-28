@@ -16,7 +16,17 @@ const getDoctors = async (req, res, next) => {
 // @route   POST /api/doctors
 // @access  Private/Admin
 const addDoctor = async (req, res, next) => {
-  const { name, specialization, phone, email, availableDays, profilePhoto } = req.body;
+  const { name, specialization, phone, email } = req.body;
+  let availableDays = req.body.availableDays;
+  
+  // Parse availableDays if it's coming as a string from FormData
+  if (typeof availableDays === 'string') {
+    try {
+      availableDays = JSON.parse(availableDays);
+    } catch (e) {
+      availableDays = [];
+    }
+  }
 
   try {
     const doctorExists = await Doctor.findOne({ email });
@@ -25,6 +35,10 @@ const addDoctor = async (req, res, next) => {
       res.status(400);
       throw new Error('Doctor with this email already exists');
     }
+
+    // Since Cloudinary is not configured in .env, we'll use a placeholder URL for now
+    // In a real scenario, we would upload req.file.path to Cloudinary here
+    const profilePhoto = req.file ? `https://ui-avatars.com/api/?name=${name}&background=random` : '';
 
     const doctor = await Doctor.create({
       name,

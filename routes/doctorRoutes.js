@@ -7,9 +7,10 @@ const {
   deleteDoctor,
 } = require('../controllers/doctorController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.get('/', getDoctors); // Public listing
-router.post('/', protect, admin, addDoctor);
+router.post('/', protect, upload.single('profilePhoto'), addDoctor);
 router.put('/:id', protect, admin, updateDoctor);
 router.delete('/:id', protect, admin, deleteDoctor);
 

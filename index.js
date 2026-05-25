@@ -13,12 +13,9 @@ const app = express();
 
 
 // Middlewares
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-}));
+app.use(cors()); // Allow all for now (Better compatibility)
 app.use(express.json());
+
 
 // DB Middleware to ensure connection on each request (Better for Vercel)
 app.use(async (req, res, next) => {
@@ -57,7 +54,7 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 5001;
 // For local testing
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
